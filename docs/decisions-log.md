@@ -82,3 +82,35 @@ app screens
 ### Related Research
 
 See [UI Component Library Research](./ui-component-library-research.md).
+
+## Decision 003: Fable Agent Workflow
+
+Date: July 3, 2026
+
+Status: Decided
+
+### Decision
+
+Backlog Battle implementation will use **Cursor Agent with Claude Fable 5** as orchestrator, delegating to project subagents in `.cursor/agents/` and phase commands in `.cursor/commands/`.
+
+Locked workflow:
+
+- Fable integrates; subagents implement bounded slices with explicit file ownership
+- `/product-planner` produces phase plans (readonly)
+- `/security-auditor` and `/verifier` gate every PR (readonly)
+- Acceptance criteria live in `docs/implementation-checklist.md`
+- Ambiguous spec defaults live in `docs/open-decisions.md`
+
+Kickoff command: `/start-fable-build` (Phase 0 + 1). Subsequent phases: `/build-phase N`.
+
+### Rationale
+
+The repo is docs-only today. A committed agent layer gives consistent delegation, verification, and scope control across local and cloud agent sessions without re-deriving process each time.
+
+### Related Files
+
+- `.cursor/README.md` — agent quick start
+- `.cursor/agents/` — eight project subagents
+- `.cursor/commands/build-phase.md` — orchestration workflow
+- `docs/implementation-checklist.md` — phase definition of done
+- `docs/open-decisions.md` — locked MVP defaults
