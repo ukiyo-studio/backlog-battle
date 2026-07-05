@@ -14,10 +14,14 @@ import {
 } from "@/components/ui";
 import { supabase } from "@/lib/supabase";
 
+type Step = "form" | "verify";
+
 export default function SignUpScreen() {
+  const [step, setStep] = useState<Step>("form");
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -46,11 +50,48 @@ export default function SignUpScreen() {
       setError(signUpError.message);
       return;
     }
-    // With email confirmation enabled there is no session yet.
-    if (!data.session) {
-      setNotice("Check your email to confirm your account, then sign in.");
+    if (data.session) {
+      // Email confirmation disabled — auth listener redirects automatically.
+      return;
     }
-    // Otherwise the auth listener picks up the session and the layout redirects.
+    setStep("verify");
+  };
+
+  const handleVerify = async () => {
+    const token = code.trim();
+    if (token.length < 6) {
+      setError("Enter the 6-digit code from your email.");
+      return;
+    }
+    setError(null);
+    setNotice(null);
+    setSubmitting(true);
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      email: email.trim(),
+      token,
+      type: "signup",
+    });
+    setSubmitting(false);
+    if (verifyError) {
+      setError(verifyError.message);
+    }
+    // On success the auth listener picks up the session and redirects.
+  };
+
+  const handleResend = async () => {
+    setError(null);
+    setNotice(null);
+    setSubmitting(true);
+    const { error: resendError } = await supabase.auth.resend({
+      type: "signup",
+      email: email.trim(),
+    });
+    setSubmitting(false);
+    if (resendError) {
+      setError(resendError.message);
+      return;
+    }
+    setNotice("A new code is on its way.");
   };
 
   return (
@@ -71,52 +112,87 @@ export default function SignUpScreen() {
           </Text>
         </View>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Create account</CardTitle>
-            <CardDescription>
-              A new challenger approaches.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="gap-4">
-            <Input
-              label="Display name"
-              placeholder="Player 1 (optional)"
-              value={displayName}
-              onChangeText={setDisplayName}
-              autoComplete="name"
-              editable={!submitting}
-            />
-            <Input
-              label="Email"
-              placeholder="you@example.com"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              autoComplete="email"
-              keyboardType="email-address"
-              editable={!submitting}
-            />
-            <Input
-              label="Password"
-              placeholder="At least 8 characters"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoComplete="new-password"
-              editable={!submitting}
-              error={error ?? undefined}
-            />
-            {notice ? (
-              <Text variant="caption" className="text-primary">
-                {notice}
-              </Text>
-            ) : null}
-            <Button onPress={handleSignUp} loading={submitting}>
-              Sign up
-            </Button>
-          </CardContent>
-        </Card>
+        {step === "form" ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Create account</CardTitle>
+              <CardDescription>A new challenger approaches.</CardDescription>
+            </CardHeader>
+            <CardContent className="gap-4">
+              <Input
+                label="Display name"
+                placeholder="Player 1 (optional)"
+                value={displayName}
+                onChangeText={setDisplayName}
+                autoComplete="name"
+                editable={!submitting}
+              />
+              <Input
+                label="Email"
+                placeholder="you@example.com"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                autoComplete="email"
+                keyboardType="email-address"
+                editable={!submitting}
+              />
+              <Input
+                label="Password"
+                placeholder="At least 8 characters"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                autoComplete="new-password"
+                editable={!submitting}
+                error={error ?? undefined}
+              />
+              <Button onPress={handleSignUp} loading={submitting}>
+                Sign up
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardHeader>
+              <CardTitle>Enter your code</CardTitle>
+              <CardDescription>
+                We sent a 6-digit code to {email.trim()}. Enter it below to
+                confirm your account.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="gap-4">
+              <Input
+                label="Confirmation code"
+                placeholder="123456"
+                value={code}
+                onChangeText={setCode}
+                keyboardType="number-pad"
+                autoComplete="one-time-code"
+                textContentType="oneTimeCode"
+                maxLength={6}
+                editable={!submitting}
+                error={error ?? undefined}
+                autoFocus
+              />
+              {notice ? (
+                <Text variant="caption" className="text-primary">
+                  {notice}
+                </Text>
+              ) : null}
+              <Button onPress={handleVerify} loading={submitting}>
+                Verify
+              </Button>
+              <Button
+                variant="ghost"
+                onPress={handleResend}
+                disabled={submitting}
+              >
+                Resend code
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         <View className="mt-6 flex-row items-center justify-center gap-1">
           <Text variant="caption">Already have an account?</Text>
