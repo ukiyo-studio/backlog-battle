@@ -1,6 +1,6 @@
 import { Link } from "expo-router";
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { KeyboardAvoidingView, Platform, View } from "react-native";
 
 import {
   Button,
@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
   Input,
+  Screen,
   Text,
 } from "@/components/ui";
 import { supabase } from "@/lib/supabase";
@@ -99,10 +100,7 @@ export default function SignUpScreen() {
       className="flex-1 bg-background"
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ScrollView
-        contentContainerClassName="flex-grow justify-center p-5"
-        keyboardShouldPersistTaps="handled"
-      >
+      <Screen contentClassName="flex-grow justify-center p-5">
         <View className="mb-8 items-center gap-2">
           <Text variant="title" className="text-center">
             Backlog Battle
@@ -202,7 +200,7 @@ export default function SignUpScreen() {
             </Text>
           </Link>
         </View>
-      </ScrollView>
+      </Screen>
     </KeyboardAvoidingView>
   );
 }

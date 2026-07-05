@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 
 import {
   Button,
@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
   Input,
+  Screen,
   Text,
 } from '../ui';
 
@@ -54,11 +55,7 @@ export function CategoryFormScreen({
   };
 
   return (
-    <ScrollView
-      className="flex-1 bg-background"
-      contentContainerClassName="p-5 pb-10"
-      keyboardShouldPersistTaps="handled"
-    >
+    <Screen contentClassName="p-5 pb-10">
       <Card>
         <CardHeader>
           <CardTitle>New category</CardTitle>
@@ -106,6 +103,6 @@ export function CategoryFormScreen({
           Save category
         </Button>
       </View>
-    </ScrollView>
+    </Screen>
   );
 }

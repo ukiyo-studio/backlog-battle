@@ -1,12 +1,11 @@
 import * as React from 'react';
 import {
   Pressable,
-  ScrollView,
   View,
   type GestureResponderEvent,
 } from 'react-native';
 
-import { Text, cn } from '../ui';
+import { Screen, Text, cn } from '../ui';
 
 /**
  * Battle matchup prototype: one head-to-head pick. This is the playful side
@@ -97,10 +96,7 @@ export function MatchupScreen({
       : 0;
 
   return (
-    <ScrollView
-      className="flex-1 bg-background"
-      contentContainerClassName="gap-6 p-5 pb-10"
-    >
+    <Screen contentClassName="gap-6 p-5 pb-10">
       {/* Round banner */}
       <View className="items-center gap-2">
         <View className="rounded border-3 border-border bg-accent px-5 py-1.5 shadow-box-sm">
@@ -147,6 +143,6 @@ export function MatchupScreen({
           />
         </View>
       </View>
-    </ScrollView>
+    </Screen>
   );
 }
