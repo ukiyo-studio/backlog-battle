@@ -1,0 +1,161 @@
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useState } from "react";
+import { ActivityIndicator, View } from "react-native";
+
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Screen,
+  Text,
+} from "@/components/ui";
+import {
+  BacklogItemRow,
+  StatusFilter,
+  statusLabel,
+} from "@/features/backlog-items/components";
+import { useBacklogItems, useCategoryDetail } from "@/features/backlog-items/hooks";
+import { colors } from "@/theme";
+import type { ItemStatus } from "@/types/backlog";
+
+export default function CategoryDetailScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
+  const categoryId = id ?? "";
+
+  const category = useCategoryDetail(categoryId);
+  const items = useBacklogItems(categoryId);
+  const [statusFilter, setStatusFilter] = useState<ItemStatus>("active");
+
+  if (category.isLoading && !category.data) {
+    return (
+      <Screen scroll={false} className="items-center justify-center">
+        <ActivityIndicator size="large" color={colors.primary} />
+      </Screen>
+    );
+  }
+
+  if (category.error) {
+    return (
+      <Screen contentClassName="flex-1 justify-center gap-6 p-5">
+        <Card>
+          <CardHeader>
+            <CardTitle>Couldn&apos;t load this category</CardTitle>
+            <CardDescription>{category.error}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onPress={() => {
+                void category.refetch();
+                void items.refetch();
+              }}
+            >
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
+      </Screen>
+    );
+  }
+
+  if (!category.data) {
+    return (
+      <Screen contentClassName="flex-1 justify-center gap-6 p-5">
+        <Card>
+          <CardHeader>
+            <CardTitle>Category not found</CardTitle>
+            <CardDescription>
+              This category doesn&apos;t exist or has been deleted.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onPress={() => router.replace("/(app)")}>Back home</Button>
+          </CardContent>
+        </Card>
+      </Screen>
+    );
+  }
+
+  const allItems = items.data ?? [];
+  const filteredItems = allItems.filter((item) => item.status === statusFilter);
+
+  return (
+    <Screen contentClassName="gap-6 p-5 pb-10">
+      <View className="mt-4 flex-row items-start justify-between gap-3">
+        <View className="flex-1 gap-1">
+          <Text variant="title">{category.data.name}</Text>
+          {category.data.description ? (
+            <Text variant="caption">{category.data.description}</Text>
+          ) : null}
+        </View>
+        <Button
+          variant="outline"
+          size="sm"
+          onPress={() => router.push(`/categories/${categoryId}/edit`)}
+        >
+          Edit
+        </Button>
+      </View>
+
+      <StatusFilter selected={statusFilter} onSelect={setStatusFilter} />
+
+      <Button onPress={() => router.push(`/categories/${categoryId}/items/new`)}>
+        Add item
+      </Button>
+
+      {items.error ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Couldn&apos;t load items</CardTitle>
+            <CardDescription>{items.error}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button variant="outline" onPress={() => void items.refetch()}>
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
+      ) : items.isLoading && !items.data ? (
+        <View className="items-center py-8">
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      ) : allItems.length === 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>No items yet</CardTitle>
+            <CardDescription>
+              Add your first item to start filling this backlog. You&apos;ll
+              need at least 2 active items to run a battle.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      ) : filteredItems.length === 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              Nothing {statusLabel(statusFilter).toLowerCase()} here
+            </CardTitle>
+            <CardDescription>
+              No items with this status. Try another filter above.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      ) : (
+        <View className="gap-3">
+          {filteredItems.map((item) => (
+            <BacklogItemRow
+              key={item.id}
+              item={item}
+              onPress={() =>
+                router.push(`/categories/${categoryId}/items/${item.id}/edit`)
+              }
+            />
+          ))}
+        </View>
+      )}
+    </Screen>
+  );
+}
