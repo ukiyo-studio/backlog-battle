@@ -21,5 +21,8 @@ export type Battle = Tables<"battles">;
 export type BattleMatchup = Tables<"battle_matchups">;
 export type BattleRanking = Tables<"battle_rankings">;
 
+export type ReminderSettings = Tables<"reminder_settings">;
+export type PushToken = Tables<"push_tokens">;
+
 export const BATTLE_STATUSES = ["active", "completed", "abandoned"] as const;
 export type BattleStatus = (typeof BATTLE_STATUSES)[number];

@@ -350,6 +350,11 @@ authorization_url_path = "/oauth/consent"
 # Allow dynamic client registration
 allow_dynamic_registration = false
 
+# Invoked hourly by pg_cron (Dashboard); no end-user JWT on scheduled calls.
+[functions.process-reminders]
+verify_jwt = false
+import_map = "./functions/process-reminders/deno.json"
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.

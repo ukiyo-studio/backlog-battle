@@ -1,20 +1,16 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 
 import {
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+  EmptyState,
+  ErrorState,
+  LoadingState,
   Screen,
   Text,
 } from "@/components/ui";
 import type { CategoryBattle } from "@/features/battles/api";
 import { BattleRow } from "@/features/battles/components";
 import { useCategoryBattles } from "@/features/battles/hooks";
-import { colors } from "@/theme";
 
 export default function CategoryBattlesScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -34,7 +30,7 @@ export default function CategoryBattlesScreen() {
   if (battles.isLoading && !battles.data) {
     return (
       <Screen scroll={false} className="items-center justify-center">
-        <ActivityIndicator size="large" color={colors.primary} />
+        <LoadingState />
       </Screen>
     );
   }
@@ -42,15 +38,11 @@ export default function CategoryBattlesScreen() {
   if (battles.error) {
     return (
       <Screen contentClassName="flex-1 justify-center gap-6 p-5">
-        <Card>
-          <CardHeader>
-            <CardTitle>Couldn&apos;t load battles</CardTitle>
-            <CardDescription>{battles.error}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onPress={() => void battles.refetch()}>Retry</Button>
-          </CardContent>
-        </Card>
+        <ErrorState
+          title="Couldn't load battles"
+          description={battles.error}
+          onRetry={() => void battles.refetch()}
+        />
       </Screen>
     );
   }
@@ -65,22 +57,15 @@ export default function CategoryBattlesScreen() {
       </View>
 
       {rows.length === 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>No battles yet</CardTitle>
-            <CardDescription>
-              Start one from the category to crown your first champion.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button
-              variant="outline"
-              onPress={() => router.replace(`/categories/${categoryId}`)}
-            >
-              Back to category
-            </Button>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title="No battles yet"
+          description="Start one from the category to crown your first champion."
+          action={{
+            label: "Back to category",
+            onPress: () => router.replace(`/categories/${categoryId}`),
+          }}
+          actionVariant="outline"
+        />
       ) : (
         <View className="gap-3">
           {rows.map((battle) => (

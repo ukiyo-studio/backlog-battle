@@ -1,7 +1,7 @@
 import { Redirect, Stack } from "expo-router";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 
-import { colors } from "@/theme";
+import { LoadingState } from "@/components/ui";
 
 import { useAuth } from "../_layout";
 
@@ -11,7 +11,7 @@ export default function AppLayout() {
   if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center bg-background">
-        <ActivityIndicator size="large" color={colors.primary} />
+        <LoadingState />
       </View>
     );
   }

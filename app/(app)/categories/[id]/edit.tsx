@@ -1,22 +1,13 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 
-import {
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  Screen,
-} from "@/components/ui";
+import { Button, ErrorState, LoadingState, Screen } from "@/components/ui";
 import { deleteCategory, updateCategory } from "@/features/categories/api";
 import { CategoryForm } from "@/features/categories/components/category-form";
 import { useCategory } from "@/features/categories/hooks";
 import { confirmDestructive } from "@/lib/confirm";
 import type { CategoryFormValues } from "@/schemas/category";
-import { colors } from "@/theme";
 
 export default function EditCategoryScreen() {
   const router = useRouter();
@@ -70,7 +61,7 @@ export default function EditCategoryScreen() {
   if (isLoading) {
     return (
       <Screen scroll={false} className="items-center justify-center">
-        <ActivityIndicator size="large" color={colors.primary} />
+        <LoadingState />
       </Screen>
     );
   }
@@ -78,28 +69,18 @@ export default function EditCategoryScreen() {
   if (error || !category) {
     return (
       <Screen contentClassName="p-5 pb-10">
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {error ? "Something went wrong" : "Category not found"}
-            </CardTitle>
-            <CardDescription>
-              {error
-                ? `We couldn't load this category. ${error.message}`
-                : "This category may have been deleted."}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="gap-3">
-            {error ? (
-              <Button variant="secondary" onPress={() => void refetch()}>
-                Try again
-              </Button>
-            ) : null}
-            <Button variant="ghost" onPress={() => router.back()}>
-              Go back
-            </Button>
-          </CardContent>
-        </Card>
+        <ErrorState
+          title={error ? "Something went wrong" : "Category not found"}
+          description={
+            error
+              ? `We couldn't load this category. ${error.message}`
+              : "This category may have been deleted."
+          }
+          onRetry={error ? () => void refetch() : undefined}
+          retryLabel="Try again"
+          retryVariant="secondary"
+          secondaryAction={{ label: "Go back", onPress: () => router.back() }}
+        />
       </Screen>
     );
   }
