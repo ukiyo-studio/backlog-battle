@@ -1,21 +1,18 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 
 import {
   Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+  EmptyState,
+  ErrorState,
+  LoadingState,
   Screen,
   Text,
 } from "@/components/ui";
 import { CategoryCard } from "@/features/categories/components/category-card";
 import { useCategories } from "@/features/categories/hooks";
 import { supabase } from "@/lib/supabase";
-import { colors } from "@/theme";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -40,23 +37,12 @@ export default function HomeScreen() {
       </Button>
 
       {isLoading ? (
-        <View className="items-center py-12">
-          <ActivityIndicator size="large" color={colors.primary} />
-        </View>
+        <LoadingState variant="inline" />
       ) : error ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Something went wrong</CardTitle>
-            <CardDescription>
-              We couldn&apos;t load your categories. {error.message}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button variant="secondary" onPress={() => void refetch()}>
-              Try again
-            </Button>
-          </CardContent>
-        </Card>
+        <ErrorState
+          description={`We couldn't load your categories. ${error.message}`}
+          onRetry={() => void refetch()}
+        />
       ) : categories && categories.length > 0 ? (
         <View className="gap-4">
           {categories.map((category) => (
@@ -68,21 +54,19 @@ export default function HomeScreen() {
           ))}
         </View>
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle>No categories yet</CardTitle>
-            <CardDescription>
-              Create your first arena — a category groups the backlog items
-              that battle each other, like Steam games or unread books.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onPress={() => router.push("/categories/new")}>
-              Create a category
-            </Button>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title="No categories yet"
+          description="Create your first arena — a category groups the backlog items that battle each other, like Steam games or unread books."
+          action={{
+            label: "Create a category",
+            onPress: () => router.push("/categories/new"),
+          }}
+        />
       )}
+
+      <Button variant="outline" onPress={() => router.push("/settings/reminders")}>
+        Reminders
+      </Button>
 
       <Button variant="ghost" onPress={handleSignOut} loading={signingOut}>
         Sign out
