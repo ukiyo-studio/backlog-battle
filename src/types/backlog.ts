@@ -16,3 +16,10 @@ export type ItemStatus = (typeof ITEM_STATUSES)[number];
 export type CategoryWithItemCount = Category & {
   itemCount: number;
 };
+
+export type Battle = Tables<"battles">;
+export type BattleMatchup = Tables<"battle_matchups">;
+export type BattleRanking = Tables<"battle_rankings">;
+
+export const BATTLE_STATUSES = ["active", "completed", "abandoned"] as const;
+export type BattleStatus = (typeof BATTLE_STATUSES)[number];

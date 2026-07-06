@@ -18,17 +18,47 @@ import {
   statusLabel,
 } from "@/features/backlog-items/components";
 import { useBacklogItems, useCategoryDetail } from "@/features/backlog-items/hooks";
+import { startBattle } from "@/features/battles/api";
 import { colors } from "@/theme";
 import type { ItemStatus } from "@/types/backlog";
+
+import { useAuth } from "../../../_layout";
 
 export default function CategoryDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const categoryId = id ?? "";
 
+  const { session } = useAuth();
   const category = useCategoryDetail(categoryId);
   const items = useBacklogItems(categoryId);
   const [statusFilter, setStatusFilter] = useState<ItemStatus>("active");
+  const [startingBattle, setStartingBattle] = useState(false);
+  const [battleError, setBattleError] = useState<string | null>(null);
+
+  const activeItemCount = (items.data ?? []).filter(
+    (item) => item.status === "active",
+  ).length;
+  const canBattle = activeItemCount >= 2;
+
+  const handleStartBattle = async () => {
+    if (!session) return;
+    setStartingBattle(true);
+    setBattleError(null);
+    try {
+      const battleId = await startBattle({
+        userId: session.user.id,
+        categoryId,
+      });
+      router.push(`/battles/${battleId}`);
+    } catch (cause) {
+      setBattleError(
+        cause instanceof Error ? cause.message : "Could not start the battle.",
+      );
+    } finally {
+      setStartingBattle(false);
+    }
+  };
 
   if (category.isLoading && !category.data) {
     return (
@@ -98,6 +128,38 @@ export default function CategoryDetailScreen() {
         >
           Edit
         </Button>
+      </View>
+
+      {/* Battle arena entry — the playful core loop lives behind this. */}
+      <View className="gap-2">
+        <View className="flex-row gap-3">
+          <Button
+            variant="secondary"
+            className="flex-1"
+            onPress={() => void handleStartBattle()}
+            loading={startingBattle}
+            disabled={!canBattle}
+          >
+            Start battle
+          </Button>
+          <Button
+            variant="outline"
+            onPress={() => router.push(`/categories/${categoryId}/battles`)}
+          >
+            History
+          </Button>
+        </View>
+        {!canBattle ? (
+          <Text variant="caption">
+            You need at least 2 active items to start a battle
+            {activeItemCount === 1 ? " — one more to go!" : "."}
+          </Text>
+        ) : null}
+        {battleError ? (
+          <Text variant="caption" className="text-destructive">
+            {battleError}
+          </Text>
+        ) : null}
       </View>
 
       <StatusFilter selected={statusFilter} onSelect={setStatusFilter} />
