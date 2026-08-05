@@ -1,5 +1,5 @@
 import type { Session } from "@supabase/supabase-js";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import {
   createContext,
@@ -11,6 +11,10 @@ import {
 
 import "../global.css";
 
+import {
+  addNotificationResponseListener,
+  configureNotificationHandler,
+} from "@/lib/notifications";
 import { supabase } from "@/lib/supabase";
 import { colors } from "@/theme";
 import type { AuthContextValue } from "@/types/auth";
@@ -52,6 +56,18 @@ function AuthProvider({ children }: PropsWithChildren) {
 }
 
 export default function RootLayout() {
+  const router = useRouter();
+
+  useEffect(() => {
+    configureNotificationHandler();
+
+    const subscription = addNotificationResponseListener(() => {
+      router.replace("/(app)");
+    });
+
+    return () => subscription.remove();
+  }, [router]);
+
   return (
     <AuthProvider>
       <Stack

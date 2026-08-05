@@ -7,8 +7,16 @@
     "icon": "./assets/images/icon.png",
     "scheme": "backlogbattle",
     "userInterfaceStyle": "automatic",
+    "extra": {
+      "eas": {
+        "projectId": "your-eas-project-id"
+      }
+    },
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "infoPlist": {
+        "NSUserNotificationsUsageDescription": "Backlog Battle sends reminders when it's time to run a new battle and refresh your backlog ranking."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -31,6 +39,15 @@
           "backgroundColor": "#208AEF",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#208AEF",
+          "defaultChannel": "reminders",
+          "sounds": []
         }
       ]
     ],

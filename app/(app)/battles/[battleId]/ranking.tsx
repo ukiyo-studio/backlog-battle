@@ -1,19 +1,16 @@
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 
 import {
   Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+  EmptyState,
+  ErrorState,
+  LoadingState,
   Screen,
   Text,
 } from "@/components/ui";
 import { ChampionCard, RankRow } from "@/features/battles/components";
 import { useBattleBundle, useBattleRanking } from "@/features/battles/hooks";
-import { colors } from "@/theme";
 
 export default function BattleRankingScreen() {
   const { battleId } = useLocalSearchParams<{ battleId: string }>();
@@ -27,7 +24,7 @@ export default function BattleRankingScreen() {
   ) {
     return (
       <Screen scroll={false} className="items-center justify-center">
-        <ActivityIndicator size="large" color={colors.primary} />
+        <LoadingState />
       </Screen>
     );
   }
@@ -36,22 +33,14 @@ export default function BattleRankingScreen() {
   if (loadError) {
     return (
       <Screen contentClassName="flex-1 justify-center gap-6 p-5">
-        <Card>
-          <CardHeader>
-            <CardTitle>Couldn&apos;t load the ranking</CardTitle>
-            <CardDescription>{loadError}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button
-              onPress={() => {
-                void bundle.refetch();
-                void ranking.refetch();
-              }}
-            >
-              Retry
-            </Button>
-          </CardContent>
-        </Card>
+        <ErrorState
+          title="Couldn't load the ranking"
+          description={loadError}
+          onRetry={() => {
+            void bundle.refetch();
+            void ranking.refetch();
+          }}
+        />
       </Screen>
     );
   }
@@ -59,17 +48,11 @@ export default function BattleRankingScreen() {
   if (!bundle.data) {
     return (
       <Screen contentClassName="flex-1 justify-center gap-6 p-5">
-        <Card>
-          <CardHeader>
-            <CardTitle>Battle not found</CardTitle>
-            <CardDescription>
-              This battle doesn&apos;t exist or belongs to another account.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onPress={() => router.replace("/(app)")}>Back home</Button>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title="Battle not found"
+          description="This battle doesn't exist or belongs to another account."
+          action={{ label: "Back home", onPress: () => router.replace("/(app)") }}
+        />
       </Screen>
     );
   }
@@ -108,14 +91,10 @@ export default function BattleRankingScreen() {
       ) : null}
 
       {rows.length === 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>No ranking recorded</CardTitle>
-            <CardDescription>
-              This battle is marked complete but no ranking was saved.
-            </CardDescription>
-          </CardHeader>
-        </Card>
+        <EmptyState
+          title="No ranking recorded"
+          description="This battle is marked complete but no ranking was saved."
+        />
       ) : null}
 
       <Button onPress={() => router.replace(`/categories/${battle.category_id}`)}>

@@ -1,5 +1,4 @@
-// Generated from the hosted Supabase project (supabase gen types / MCP).
-// Regenerate after schema migrations — do not edit by hand.
+// Generated from hosted Supabase project
 
 export type Json =
   | string
@@ -290,6 +289,74 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      push_tokens: {
+        Row: {
+          created_at: string
+          id: string
+          platform: string
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          platform: string
+          token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          platform?: string
+          token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reminder_settings: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          enabled: boolean
+          frequency: string
+          id: string
+          next_reminder_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          enabled?: boolean
+          frequency?: string
+          id?: string
+          next_reminder_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          enabled?: boolean
+          frequency?: string
+          id?: string
+          next_reminder_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reminder_settings_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

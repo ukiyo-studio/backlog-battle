@@ -1,14 +1,11 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator } from "react-native";
 
 import {
   Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+  EmptyState,
+  ErrorState,
+  LoadingState,
   Screen,
 } from "@/components/ui";
 import { deleteBacklogItem, updateBacklogItem } from "@/features/backlog-items/api";
@@ -18,7 +15,6 @@ import {
 } from "@/features/backlog-items/components";
 import { useBacklogItem } from "@/features/backlog-items/hooks";
 import { confirmDestructive } from "@/lib/confirm";
-import { colors } from "@/theme";
 import type { ItemStatus } from "@/types/backlog";
 
 export default function EditBacklogItemScreen() {
@@ -75,7 +71,7 @@ export default function EditBacklogItemScreen() {
   if (item.isLoading && !item.data) {
     return (
       <Screen scroll={false} className="items-center justify-center">
-        <ActivityIndicator size="large" color={colors.primary} />
+        <LoadingState />
       </Screen>
     );
   }
@@ -83,18 +79,12 @@ export default function EditBacklogItemScreen() {
   if (item.error) {
     return (
       <Screen contentClassName="flex-1 justify-center gap-6 p-5">
-        <Card>
-          <CardHeader>
-            <CardTitle>Couldn&apos;t load this item</CardTitle>
-            <CardDescription>{item.error}</CardDescription>
-          </CardHeader>
-          <CardContent className="gap-3">
-            <Button onPress={() => void item.refetch()}>Retry</Button>
-            <Button variant="ghost" onPress={() => router.back()}>
-              Go back
-            </Button>
-          </CardContent>
-        </Card>
+        <ErrorState
+          title="Couldn't load this item"
+          description={item.error}
+          onRetry={() => void item.refetch()}
+          secondaryAction={{ label: "Go back", onPress: () => router.back() }}
+        />
       </Screen>
     );
   }
@@ -102,17 +92,11 @@ export default function EditBacklogItemScreen() {
   if (!item.data) {
     return (
       <Screen contentClassName="flex-1 justify-center gap-6 p-5">
-        <Card>
-          <CardHeader>
-            <CardTitle>Item not found</CardTitle>
-            <CardDescription>
-              This item doesn&apos;t exist or has been deleted.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onPress={() => router.back()}>Go back</Button>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title="Item not found"
+          description="This item doesn't exist or has been deleted."
+          action={{ label: "Go back", onPress: () => router.back() }}
+        />
       </Screen>
     );
   }

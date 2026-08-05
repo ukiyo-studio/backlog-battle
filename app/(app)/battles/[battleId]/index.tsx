@@ -1,6 +1,6 @@
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 
 import {
   Button,
@@ -9,6 +9,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  EmptyState,
+  ErrorState,
+  LoadingState,
   Screen,
   Text,
 } from "@/components/ui";
@@ -26,7 +29,6 @@ import {
 } from "@/features/battles/components";
 import { useBattleBundle } from "@/features/battles/hooks";
 import { confirmDestructive } from "@/lib/confirm";
-import { colors } from "@/theme";
 
 interface LiveBattle {
   /** The bundle this continuation was derived from; a new fetch resets it. */
@@ -59,7 +61,7 @@ export default function BattlePlayScreen() {
   if (bundle.isLoading && !bundle.data) {
     return (
       <Screen scroll={false} className="items-center justify-center">
-        <ActivityIndicator size="large" color={colors.primary} />
+        <LoadingState />
       </Screen>
     );
   }
@@ -67,15 +69,11 @@ export default function BattlePlayScreen() {
   if (bundle.error) {
     return (
       <Screen contentClassName="flex-1 justify-center gap-6 p-5">
-        <Card>
-          <CardHeader>
-            <CardTitle>Couldn&apos;t load this battle</CardTitle>
-            <CardDescription>{bundle.error}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onPress={() => void bundle.refetch()}>Retry</Button>
-          </CardContent>
-        </Card>
+        <ErrorState
+          title="Couldn't load this battle"
+          description={bundle.error}
+          onRetry={() => void bundle.refetch()}
+        />
       </Screen>
     );
   }
@@ -83,17 +81,11 @@ export default function BattlePlayScreen() {
   if (!bundle.data) {
     return (
       <Screen contentClassName="flex-1 justify-center gap-6 p-5">
-        <Card>
-          <CardHeader>
-            <CardTitle>Battle not found</CardTitle>
-            <CardDescription>
-              This battle doesn&apos;t exist or belongs to another account.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onPress={() => router.replace("/(app)")}>Back home</Button>
-          </CardContent>
-        </Card>
+        <EmptyState
+          title="Battle not found"
+          description="This battle doesn't exist or belongs to another account."
+          action={{ label: "Back home", onPress: () => router.replace("/(app)") }}
+        />
       </Screen>
     );
   }
