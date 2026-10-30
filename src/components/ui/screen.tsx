@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ScrollView, View, type ViewProps } from 'react-native';
+import { Platform, ScrollView, View, type ViewInstance, type ViewProps } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { cn } from './utils';
@@ -7,7 +7,9 @@ import { cn } from './utils';
 /**
  * Screen container that pads content into the safe area (status bar, notch,
  * home indicator). Headers are hidden app-wide (headerShown: false), so every
- * screen should render inside a Screen.
+ * screen should render inside a Screen. Native padding comes from
+ * react-native-safe-area-context. Web uses CSS safe-area insets, because
+ * Expo Router no longer measures them on web.
  */
 export interface ScreenProps extends ViewProps {
   className?: string;
@@ -20,7 +22,7 @@ export interface ScreenProps extends ViewProps {
   children?: React.ReactNode;
 }
 
-const Screen = React.forwardRef<View, ScreenProps>(
+const Screen = React.forwardRef<ViewInstance, ScreenProps>(
   (
     {
       className,
@@ -34,10 +36,18 @@ const Screen = React.forwardRef<View, ScreenProps>(
     ref,
   ) => {
     const insets = useSafeAreaInsets();
-    const padding = {
-      paddingTop: edges.includes("top") ? insets.top : 0,
-      paddingBottom: edges.includes("bottom") ? insets.bottom : 0,
-    };
+    const padding =
+      Platform.OS === "web"
+        ? {
+            paddingTop: edges.includes("top") ? "env(safe-area-inset-top, 0px)" : 0,
+            paddingBottom: edges.includes("bottom")
+              ? "env(safe-area-inset-bottom, 0px)"
+              : 0,
+          }
+        : {
+            paddingTop: edges.includes("top") ? insets.top : 0,
+            paddingBottom: edges.includes("bottom") ? insets.bottom : 0,
+          };
 
     if (scroll) {
       return (

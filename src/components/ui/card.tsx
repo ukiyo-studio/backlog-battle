@@ -1,9 +1,5 @@
 import * as React from 'react';
-import {
-  View,
-  type Text as RNText,
-  type ViewProps,
-} from 'react-native';
+import { View, type TextInstance, type ViewInstance, type ViewProps } from 'react-native';
 
 import { Text, type TextProps } from './text';
 import { cn } from './utils';
@@ -17,7 +13,7 @@ export interface CardProps extends ViewProps {
   className?: string;
 }
 
-const Card = React.forwardRef<View, CardProps>(
+const Card = React.forwardRef<ViewInstance, CardProps>(
   ({ className, ...props }, ref) => (
     <View
       ref={ref}
@@ -31,14 +27,14 @@ const Card = React.forwardRef<View, CardProps>(
 );
 Card.displayName = 'Card';
 
-const CardHeader = React.forwardRef<View, CardProps>(
+const CardHeader = React.forwardRef<ViewInstance, CardProps>(
   ({ className, ...props }, ref) => (
     <View ref={ref} className={cn('gap-1.5 p-4', className)} {...props} />
   ),
 );
 CardHeader.displayName = 'CardHeader';
 
-const CardTitle = React.forwardRef<RNText, TextProps>(
+const CardTitle = React.forwardRef<TextInstance, TextProps>(
   ({ className, ...props }, ref) => (
   <Text
     ref={ref}
@@ -49,21 +45,21 @@ const CardTitle = React.forwardRef<RNText, TextProps>(
 ));
 CardTitle.displayName = 'CardTitle';
 
-const CardDescription = React.forwardRef<RNText, TextProps>(
+const CardDescription = React.forwardRef<TextInstance, TextProps>(
   ({ className, ...props }, ref) => (
     <Text ref={ref} variant="caption" className={className} {...props} />
   ),
 );
 CardDescription.displayName = 'CardDescription';
 
-const CardContent = React.forwardRef<View, CardProps>(
+const CardContent = React.forwardRef<ViewInstance, CardProps>(
   ({ className, ...props }, ref) => (
     <View ref={ref} className={cn('p-4 pt-0', className)} {...props} />
   ),
 );
 CardContent.displayName = 'CardContent';
 
-const CardFooter = React.forwardRef<View, CardProps>(
+const CardFooter = React.forwardRef<ViewInstance, CardProps>(
   ({ className, ...props }, ref) => (
     <View
       ref={ref}
