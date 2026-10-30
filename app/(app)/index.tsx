@@ -68,6 +68,10 @@ export default function HomeScreen() {
         Reminders
       </Button>
 
+      <Button variant="outline" onPress={() => router.push("/settings/account")}>
+        Account
+      </Button>
+
       <Button variant="ghost" onPress={handleSignOut} loading={signingOut}>
         Sign out
       </Button>
