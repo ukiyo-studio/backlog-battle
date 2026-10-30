@@ -7,11 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "backlogbattle",
     "userInterfaceStyle": "automatic",
-    "extra": {
-      "eas": {
-        "projectId": "your-eas-project-id"
-      }
-    },
     "ios": {
       "icon": "./assets/expo.icon",
       "infoPlist": {
@@ -49,10 +44,25 @@
           "defaultChannel": "reminders",
           "sounds": []
         }
+      ],
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://de.sentry.io/",
+          "organization": "ukiyo-floating-world",
+          "project": "backlog-battle"
+        }
       ]
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "31b46378-b2a6-4308-9064-b2c20ca76f50"
+      }
+    },
+    "owner": "ukiyo.development"
   }
 }

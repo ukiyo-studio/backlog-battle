@@ -1,3 +1,4 @@
+import { Sentry } from "@/lib/sentry";
 import type { Session } from "@supabase/supabase-js";
 import { Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -55,7 +56,7 @@ function AuthProvider({ children }: PropsWithChildren) {
   );
 }
 
-export default function RootLayout() {
+function RootLayout() {
   const router = useRouter();
 
   useEffect(() => {
@@ -83,3 +84,5 @@ export default function RootLayout() {
     </AuthProvider>
   );
 }
+
+export default Sentry.wrap(RootLayout);
