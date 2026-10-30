@@ -45,6 +45,35 @@ npx supabase migration new <name>
 
 This creates a timestamped file in `migrations/`. Keep migrations idempotent (`create table if not exists`, `drop policy if exists` before `create policy`, etc.) and never edit an already-applied migration — add a new one instead.
 
+## Account deletion
+
+In-app path: **Home → Account → Delete account** (with an explicit confirmation).
+
+### Edge Function: `delete-account`
+
+Verifies the caller's JWT, deletes that user's battles first (so `battle_matchups` / `battle_rankings` with `ON DELETE RESTRICT` on items are cleared), then deletes the `auth.users` row. Remaining owned rows cascade via foreign keys (`profiles`, `categories`, `backlog_items`, `reminder_settings`, `push_tokens`).
+
+The function never accepts a user id from the request body — only the authenticated JWT subject is deleted.
+
+**Deploy:**
+
+```bash
+npx supabase functions deploy delete-account
+```
+
+`config.toml` leaves `verify_jwt = true` (default) so unauthenticated calls are rejected before the handler runs. The handler still re-checks the JWT with `auth.getUser()`.
+
+**Local invoke** (after `npx supabase start` and signing in to obtain an access token):
+
+```bash
+npx supabase functions serve delete-account
+curl -i --request POST 'http://127.0.0.1:54321/functions/v1/delete-account' \
+  -H "Authorization: Bearer $USER_ACCESS_TOKEN" \
+  -H "apikey: $ANON_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
 ## Reminders (Phase 4)
 
 ### MVP behavior

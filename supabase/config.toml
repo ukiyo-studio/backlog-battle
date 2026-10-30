@@ -355,6 +355,11 @@ allow_dynamic_registration = false
 verify_jwt = false
 import_map = "./functions/process-reminders/deno.json"
 
+# Called by signed-in clients via supabase.functions.invoke (user JWT required).
+[functions.delete-account]
+verify_jwt = true
+import_map = "./functions/delete-account/deno.json"
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.
