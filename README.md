@@ -30,10 +30,9 @@ Required environment variables (see `.env.example`):
 | `npm run ios` / `npm run android` / `npm run web` | Start on a specific platform |
 | `npm run typecheck` | TypeScript type checking (`tsc --noEmit`) |
 | `npm run lint` | Lint with `expo lint` |
+| `npm test` | Run domain unit tests (`vitest`) |
 
-## Testing status (Phase 0/1)
-
-Verified: TypeScript typecheck, ESLint, `expo-doctor`, static web export, and iOS JS bundle all pass. Known gap: interactive runtime smoke testing (tapping through auth and prototype screens on a device/simulator and browser) has not been performed yet — planned alongside Phase 2 feature work.
+Native builds use EAS (`eas.json`). iOS/Android app IDs are configured in `app.json`.
 
 ## Project structure
 

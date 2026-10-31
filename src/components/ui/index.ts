@@ -1,5 +1,7 @@
 export { Button, buttonTextVariants, buttonVariants } from './button';
 export type { ButtonProps } from './button';
+export { Chip } from './chip';
+export type { ChipProps } from './chip';
 export { EmptyState } from './empty-state';
 export type { EmptyStateProps } from './empty-state';
 export { ErrorState } from './error-state';

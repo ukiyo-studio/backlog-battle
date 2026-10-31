@@ -1,86 +1,70 @@
 import { Sentry } from "@/lib/sentry";
-import type { Session } from "@supabase/supabase-js";
 import { Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type PropsWithChildren,
-} from "react";
+import { useEffect } from "react";
+import { View } from "react-native";
 
 import "../global.css";
 
+import { LoadingState } from "@/components/ui";
+import { AuthProvider, useAuth } from "@/lib/auth";
 import {
   addNotificationResponseListener,
   configureNotificationHandler,
+  ensureAndroidNotificationChannel,
 } from "@/lib/notifications";
-import { supabase } from "@/lib/supabase";
 import { colors } from "@/theme";
-import type { AuthContextValue } from "@/types/auth";
 
-const AuthContext = createContext<AuthContextValue>({
-  session: null,
-  isLoading: true,
-});
-
-export function useAuth() {
-  return useContext(AuthContext);
-}
-
-function AuthProvider({ children }: PropsWithChildren) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setIsLoading(false);
-    });
-
-    const { data: subscription } = supabase.auth.onAuthStateChange(
-      (_event, nextSession) => {
-        setSession(nextSession);
-        setIsLoading(false);
-      },
-    );
-
-    return () => subscription.subscription.unsubscribe();
-  }, []);
-
-  return (
-    <AuthContext.Provider value={{ session, isLoading }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
-function RootLayout() {
+function RootNavigator() {
+  const { session, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     configureNotificationHandler();
+    void ensureAndroidNotificationChannel();
 
     const subscription = addNotificationResponseListener(() => {
+      // Reminder payloads currently only carry `{ type: "reminder" }`.
       router.replace("/(app)");
     });
 
     return () => subscription.remove();
   }, [router]);
 
+  if (isLoading) {
+    return (
+      <View className="flex-1 items-center justify-center bg-background">
+        <LoadingState />
+      </View>
+    );
+  }
+
   return (
-    <AuthProvider>
+    <>
       <Stack
         screenOptions={{
           headerShown: false,
           contentStyle: { backgroundColor: colors.background },
         }}
       >
-        <Stack.Screen name="(auth)" />
-        <Stack.Screen name="(app)" />
+        <Stack.Protected guard={!!session}>
+          <Stack.Screen name="(app)" />
+        </Stack.Protected>
+        <Stack.Protected guard={!session}>
+          <Stack.Screen name="(auth)" />
+        </Stack.Protected>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="dark" />
+    </>
+  );
+}
+
+function RootLayout() {
+  return (
+    <AuthProvider>
+      <RootNavigator />
     </AuthProvider>
   );
 }

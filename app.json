@@ -6,16 +6,18 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "backlogbattle",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "ios": {
+      "bundleIdentifier": "com.ukiyo.backlogbattle",
       "icon": "./assets/expo.icon",
       "infoPlist": {
         "NSUserNotificationsUsageDescription": "Backlog Battle sends reminders when it's time to run a new battle and refresh your backlog ranking."
       }
     },
     "android": {
+      "package": "com.ukiyo.backlogbattle",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#FAF5EA",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -23,6 +25,7 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
+      "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
@@ -31,7 +34,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#FAF5EA",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
@@ -39,8 +42,8 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/icon.png",
-          "color": "#208AEF",
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#2563EB",
           "defaultChannel": "reminders",
           "sounds": []
         }

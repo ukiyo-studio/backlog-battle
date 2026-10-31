@@ -1,6 +1,6 @@
 import { View } from "react-native";
 
-import { Chip } from "@/features/backlog-items/components/chip";
+import { Chip } from "@/components/ui";
 import { REMINDER_FREQUENCIES, type ReminderFrequency } from "@/schemas/reminder";
 
 const FREQUENCY_LABELS: Record<ReminderFrequency, string> = {

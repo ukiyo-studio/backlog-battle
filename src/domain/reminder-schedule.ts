@@ -1,6 +1,10 @@
 export type ReminderFrequency = "weekly" | "biweekly" | "monthly";
 
-/** Next fire time for a reminder interval. Shared by client and Edge Function logic. */
+/**
+ * Next fire time for a reminder interval.
+ * Uses UTC calendar math so client and Edge Function schedules stay aligned
+ * regardless of the device timezone.
+ */
 export function calculateNextReminderAt(
   frequency: ReminderFrequency,
   fromDate: Date,
@@ -9,13 +13,13 @@ export function calculateNextReminderAt(
 
   switch (frequency) {
     case "weekly":
-      next.setDate(next.getDate() + 7);
+      next.setUTCDate(next.getUTCDate() + 7);
       break;
     case "biweekly":
-      next.setDate(next.getDate() + 14);
+      next.setUTCDate(next.getUTCDate() + 14);
       break;
     case "monthly":
-      next.setDate(next.getDate() + 30);
+      next.setUTCDate(next.getUTCDate() + 30);
       break;
   }
 

@@ -33,7 +33,7 @@ import type { ReminderFrequency } from "@/schemas/reminder";
 import { parseReminderFrequency } from "@/schemas/reminder";
 import { colors } from "@/theme";
 
-import { useAuth } from "../../_layout";
+import { useAuth } from "@/lib/auth";
 
 const DEFAULT_FREQUENCY: ReminderFrequency = "weekly";
 
