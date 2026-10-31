@@ -2,8 +2,8 @@ import * as React from 'react';
 import {
   ActivityIndicator,
   Pressable,
-  View,
   type GestureResponderEvent,
+  type PressableInstance,
   type PressableProps,
 } from 'react-native';
 import { cva, type VariantProps } from 'class-variance-authority';
@@ -109,7 +109,7 @@ export interface ButtonProps
   textClassName?: string;
 }
 
-const Button = React.forwardRef<View, ButtonProps>(
+const Button = React.forwardRef<PressableInstance, ButtonProps>(
   (
     {
       className,

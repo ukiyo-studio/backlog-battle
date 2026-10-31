@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TextInput, View, type TextInputProps } from 'react-native';
+import { TextInput, View, type TextInputInstance, type TextInputProps } from 'react-native';
 
 import { colors } from '../../theme';
 import { Text } from './text';
@@ -19,7 +19,7 @@ export interface InputProps extends TextInputProps {
   error?: string;
 }
 
-const Input = React.forwardRef<TextInput, InputProps>(
+const Input = React.forwardRef<TextInputInstance, InputProps>(
   (
     {
       className,
