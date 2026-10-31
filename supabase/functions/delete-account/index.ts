@@ -58,9 +58,9 @@ Deno.serve(async (req) => {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
-  // battle_matchups / battle_rankings reference backlog_items with ON DELETE
-  // RESTRICT. Delete battles first so matchups/rankings cascade away before
-  // auth.users deletion cascades into backlog_items.
+  // battle_matchups, battle_rankings, and start_checks reference backlog_items
+  // with ON DELETE RESTRICT. Delete battles first so those rows cascade away
+  // before auth.users deletion cascades into backlog_items.
   const { error: battlesError } = await admin
     .from("battles")
     .delete()

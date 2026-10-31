@@ -12,11 +12,17 @@ import {
 } from "@/components/ui";
 import { CategoryCard } from "@/features/categories/components/category-card";
 import { useCategories } from "@/features/categories/hooks";
+import { StartCheckPrompt } from "@/features/battles/components";
+import { useDueStartCheck } from "@/features/battles/hooks";
 import { supabase } from "@/lib/supabase";
+
+import { useAuth } from "@/lib/auth";
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { session } = useAuth();
   const { data: categories, isLoading, error, refetch } = useCategories();
+  const dueCheck = useDueStartCheck(session?.user.id);
   const [signingOut, setSigningOut] = useState(false);
 
   const handleSignOut = async () => {
@@ -37,6 +43,13 @@ export default function HomeScreen() {
         <Text variant="title">Backlog Battle</Text>
         <Text variant="caption">Your categories</Text>
       </View>
+
+      {dueCheck.data ? (
+        <StartCheckPrompt
+          check={dueCheck.data}
+          onAnswered={() => void dueCheck.refetch()}
+        />
+      ) : null}
 
       <Button onPress={() => router.push("/categories/new")}>
         New category

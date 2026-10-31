@@ -6,9 +6,11 @@ import type { BattleRanking } from "@/types/backlog";
 import {
   fetchBattleBundle,
   fetchBattlesForCategory,
+  fetchDueStartCheck,
   fetchRanking,
   type BattleBundle,
   type CategoryBattle,
+  type DueStartCheck,
 } from "./api";
 
 /**
@@ -29,6 +31,17 @@ export function useCategoryBattles(
   const fetcher = useCallback(
     () => fetchBattlesForCategory(categoryId),
     [categoryId],
+  );
+  return useFocusQuery(fetcher);
+}
+
+/** Oldest due, unanswered follow-through for this user. */
+export function useDueStartCheck(
+  userId: string | undefined,
+): FocusQueryResult<DueStartCheck> {
+  const fetcher = useCallback(
+    () => (userId ? fetchDueStartCheck(userId) : Promise.resolve(null)),
+    [userId],
   );
   return useFocusQuery(fetcher);
 }

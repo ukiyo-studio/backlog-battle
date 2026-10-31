@@ -5,7 +5,13 @@ const EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send";
 
 const REMINDER_TITLE = "Backlog Battle";
 const REMINDER_BODY =
-  "Your backlog is waiting. Start a new battle and pick what deserves your time next.";
+  "Your backlog is waiting. Run a short duel and pick what to open next.";
+
+interface PushMessage {
+  title: string;
+  body: string;
+  data: Record<string, string>;
+}
 
 type ReminderSetting = {
   id: string;
@@ -57,6 +63,7 @@ function isInvalidTokenError(ticket: ExpoTicket): boolean {
 
 async function sendExpoPushBatch(
   tokens: PushToken[],
+  message: PushMessage,
 ): Promise<{ sent: number; errors: string[]; invalidTokenIds: string[] }> {
   if (tokens.length === 0) {
     return { sent: 0, errors: [], invalidTokenIds: [] };
@@ -74,9 +81,9 @@ async function sendExpoPushBatch(
 
   const messages = tokens.map((row) => ({
     to: row.token,
-    title: REMINDER_TITLE,
-    body: REMINDER_BODY,
-    data: { type: "reminder" },
+    title: message.title,
+    body: message.body,
+    data: message.data,
     channelId: "reminders",
     sound: "default",
   }));
@@ -197,7 +204,11 @@ Deno.serve(async (req) => {
     if (tokenError) {
       errors.push(`setting ${setting.id}: ${tokenError.message}`);
     } else if (tokenRows && tokenRows.length > 0) {
-      const pushResult = await sendExpoPushBatch(tokenRows as PushToken[]);
+      const pushResult = await sendExpoPushBatch(tokenRows as PushToken[], {
+        title: REMINDER_TITLE,
+        body: REMINDER_BODY,
+        data: { type: "reminder" },
+      });
       sent += pushResult.sent;
       errors.push(...pushResult.errors.map((msg) => `setting ${setting.id}: ${msg}`));
 
@@ -224,12 +235,87 @@ Deno.serve(async (req) => {
     }
   }
 
+  let startChecksProcessed = 0;
+  let startChecksSent = 0;
+
+  const { data: dueChecks, error: checksError } = await supabase
+    .from("start_checks")
+    .select("id, user_id, battle_id, backlog_items(title)")
+    .is("outcome", null)
+    .is("notified_at", null)
+    .lte("due_at", now);
+
+  if (checksError) {
+    errors.push(`start checks: ${checksError.message}`);
+  } else {
+    for (const check of dueChecks ?? []) {
+      startChecksProcessed += 1;
+      const title = embeddedTitle(check.backlog_items) ?? "your pick";
+
+      const { data: tokenRows, error: tokenError } = await supabase
+        .from("push_tokens")
+        .select("id, token")
+        .eq("user_id", check.user_id);
+
+      if (tokenError) {
+        errors.push(`start check ${check.id}: ${tokenError.message}`);
+        continue;
+      }
+
+      if (!tokenRows || tokenRows.length === 0) {
+        continue;
+      }
+
+      const pushResult = await sendExpoPushBatch(tokenRows as PushToken[], {
+        title: "Did you start?",
+        body: `Did you start ${title}?`,
+        data: { type: "start_check", battleId: check.battle_id, checkId: check.id },
+      });
+      startChecksSent += pushResult.sent;
+      errors.push(
+        ...pushResult.errors.map((msg) => `start check ${check.id}: ${msg}`),
+      );
+
+      if (pushResult.invalidTokenIds.length > 0) {
+        const { error: deleteError } = await supabase
+          .from("push_tokens")
+          .delete()
+          .in("id", pushResult.invalidTokenIds);
+
+        if (deleteError) {
+          errors.push(
+            `start check ${check.id}: token cleanup failed: ${deleteError.message}`,
+          );
+        }
+      }
+
+      const { error: notifiedError } = await supabase
+        .from("start_checks")
+        .update({ notified_at: now })
+        .eq("id", check.id)
+        .is("notified_at", null);
+
+      if (notifiedError) {
+        errors.push(`start check ${check.id}: ${notifiedError.message}`);
+      }
+    }
+  }
+
   return new Response(
     JSON.stringify({
       processed,
       sent,
+      startChecksProcessed,
+      startChecksSent,
       errors,
     }),
     { headers: { "Content-Type": "application/json" } },
   );
 });
+
+function embeddedTitle(value: unknown): string | null {
+  const row = Array.isArray(value) ? value[0] : value;
+  if (!row || typeof row !== "object" || !("title" in row)) return null;
+  const title = (row as { title?: unknown }).title;
+  return typeof title === "string" ? title : null;
+}

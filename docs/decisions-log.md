@@ -114,3 +114,31 @@ The repo is docs-only today. A committed agent layer gives consistent delegation
 - `.cursor/commands/build-phase.md` — orchestration workflow
 - `docs/implementation-checklist.md` — phase definition of done
 - `docs/open-decisions.md` — locked MVP defaults
+
+## Decision 004: Start Duels
+
+Date: October 31, 2026
+
+Status: Decided
+
+### Decision
+
+New battles are Start Duels, not full-category knockouts.
+
+- Context is time (`tonight`, `weekend`, `whenever`) and energy (`low`, `medium`, `locked_in`).
+- The pool is active items. Items that bounced or were never opened in that same context during the last 14 days are skipped. If that leaves fewer than 2 items, the full active list is used.
+- A seeded shuffle caps the shortlist at 8. Play is king of the hill: at most 7 choices, stopping early when the leader wins 3 in a row.
+- The saved result is a pick and the last item that pick beat. Start Duels do not write a full `battle_rankings` list.
+- Three hours later the app asks whether that pick was sticking, bounced, or never opened. "I finished it" marks the item completed.
+- The runner-up can replace the pick once, before that check is answered.
+- Rows with `algorithm = 'knockout'` remain history. Store imports, social lists, and a permanent all-time rating stay out.
+
+### Rationale
+
+Pairwise choice is the useful part of a tournament. A full bracket costs more as the backlog grows, and ordering items by the round they lost overstates how precise that order is. The follow-through check records whether the pick was actually started.
+
+### Related Files
+
+- `src/domain/start-duel.ts` — session rules
+- `supabase/migrations/20261031120000_start_duels.sql` — schema
+- `docs/open-decisions.md` — OD-009

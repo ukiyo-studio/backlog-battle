@@ -10,6 +10,7 @@ Database schema, Row Level Security policies, and local dev config for Backlog B
 - `migrations/20260706210000_battle_tables.sql` — creates `battles` (owner-scoped knockout battles with a `participant_item_ids` snapshot), `battle_matchups` (per-round pairings with winner tracking), and `battle_rankings` (final per-battle rankings), all RLS-gated by battle ownership.
 - `migrations/20260706220000_reminder_settings.sql` — creates `reminder_settings` (user reminder preferences; MVP uses global rows with `category_id IS NULL`) and `push_tokens` (Expo push tokens per device), both RLS-gated by `user_id`.
 - `migrations/20260706220100_phase4_hardening.sql` — reminder_settings policies verify category ownership when `category_id` is set; caps push token length.
+- `migrations/20261031120000_start_duels.sql` — widens `battles.algorithm` with `start_duel` (new default), adds context and pick columns, and creates `start_checks` for follow-through. RLS is owner-scoped by `user_id`.
 
 RLS is enabled on all tables with owner-scoped select/insert/update/delete policies.
 

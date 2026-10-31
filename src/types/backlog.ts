@@ -20,6 +20,15 @@ export type CategoryWithItemCount = Category & {
 export type Battle = Tables<"battles">;
 export type BattleMatchup = Tables<"battle_matchups">;
 export type BattleRanking = Tables<"battle_rankings">;
+export type StartCheck = Tables<"start_checks">;
+
+export const START_CHECK_OUTCOMES = [
+  "sticking",
+  "bounced",
+  "never_opened",
+] as const;
+
+export type StartCheckOutcome = (typeof START_CHECK_OUTCOMES)[number];
 
 export type ReminderSettings = Tables<"reminder_settings">;
 export type PushToken = Tables<"push_tokens">;

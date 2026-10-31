@@ -80,6 +80,16 @@ Status key: **Locked** = proceed with this default | **Needs confirmation** = pr
 
 ---
 
+## Decision OD-009: Start Duels replace new knockouts
+
+**Status:** Locked
+
+**Default:** New battles are Start Duels. The user picks a time window (`tonight`, `weekend`, `whenever`) and energy (`low`, `medium`, `locked_in`). The duel is king-of-the-hill over a seeded shortlist of at most 8 active items, and it stops when the leader wins 3 in a row, the shortlist is exhausted, or 7 matchups are done. The result stores a pick and a runner-up, not a full ranking. A follow-through check is due 3 hours later with outcomes `sticking`, `bounced`, or `never_opened`. Bounced and never-opened items are left out of that same window for 14 days, unless fewer than 2 items would remain. Existing `algorithm = 'knockout'` rows stay readable.
+
+**Rationale:** A full bracket gets longer as the backlog grows, and elimination order is a weak ranking. The product is a short choice that gets checked against what the user actually opened.
+
+---
+
 ## Override process
 
 If the user says "override OD-00X" or gives a conflicting instruction, update this file in the same PR and note the change in `docs/decisions-log.md` as a new decision entry.

@@ -19,7 +19,9 @@ export default function CategoryBattlesScreen() {
   const battles = useCategoryBattles(categoryId);
 
   const openBattle = (battle: CategoryBattle) => {
-    if (battle.status === "completed") {
+    if (battle.status === "completed" && battle.algorithm === "start_duel") {
+      router.push(`/battles/${battle.id}/start`);
+    } else if (battle.status === "completed") {
       router.push(`/battles/${battle.id}/ranking`);
     } else {
       // Active battles resume play; abandoned ones show their status card.
@@ -59,7 +61,7 @@ export default function CategoryBattlesScreen() {
       {rows.length === 0 ? (
         <EmptyState
           title="No battles yet"
-          description="Start one from the category to crown your first champion."
+          description="Start one from the category to pick what to open next."
           action={{
             label: "Back to category",
             onPress: () => router.replace(`/categories/${categoryId}`),
