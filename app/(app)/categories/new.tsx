@@ -6,7 +6,7 @@ import { createCategory } from "@/features/categories/api";
 import { CategoryForm } from "@/features/categories/components/category-form";
 import type { CategoryFormValues } from "@/schemas/category";
 
-import { useAuth } from "../../_layout";
+import { useAuth } from "@/lib/auth";
 
 export default function NewCategoryScreen() {
   const router = useRouter();

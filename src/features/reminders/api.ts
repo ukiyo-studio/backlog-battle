@@ -72,21 +72,3 @@ export async function upsertReminderSettings(input: {
   if (error) throw new Error(error.message);
   return data as ReminderSettings;
 }
-
-export async function upsertPushToken(input: {
-  userId: string;
-  token: string;
-  platform: "ios" | "android";
-}): Promise<void> {
-  const { error } = await supabase.from("push_tokens").upsert(
-    {
-      user_id: input.userId,
-      token: input.token,
-      platform: input.platform,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "token" },
-  );
-
-  if (error) throw new Error(error.message);
-}

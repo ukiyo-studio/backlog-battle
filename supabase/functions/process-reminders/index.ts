@@ -77,6 +77,8 @@ async function sendExpoPushBatch(
     title: REMINDER_TITLE,
     body: REMINDER_BODY,
     data: { type: "reminder" },
+    channelId: "reminders",
+    sound: "default",
   }));
 
   const response = await fetch(EXPO_PUSH_URL, {
@@ -128,15 +130,28 @@ async function sendExpoPushBatch(
 }
 
 Deno.serve(async (req) => {
+  if (req.method !== "POST") {
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  // Fail closed: verify_jwt is disabled for cron callers, so CRON_SECRET is required.
   const cronSecret = Deno.env.get("CRON_SECRET");
-  if (cronSecret) {
-    const authHeader = req.headers.get("Authorization");
-    if (authHeader !== `Bearer ${cronSecret}`) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
+  if (!cronSecret) {
+    return new Response(
+      JSON.stringify({ error: "CRON_SECRET is not configured" }),
+      { status: 500, headers: { "Content-Type": "application/json" } },
+    );
+  }
+
+  const authHeader = req.headers.get("Authorization");
+  if (authHeader !== `Bearer ${cronSecret}`) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");

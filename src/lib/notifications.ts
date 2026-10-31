@@ -1,11 +1,23 @@
 import Constants from "expo-constants";
 import * as Device from "expo-device";
-import * as Notifications from "expo-notifications";
+import {
+  AndroidImportance,
+  addNotificationResponseReceivedListener,
+  getExpoPushTokenAsync,
+  getPermissionsAsync,
+  requestPermissionsAsync,
+  setNotificationChannelAsync,
+  setNotificationHandler,
+  type EventSubscription,
+  type NotificationResponse,
+} from "expo-notifications";
 import { Platform } from "react-native";
 
 import { supabase } from "@/lib/supabase";
 
 export type PushPlatform = "ios" | "android";
+
+export const ANDROID_REMINDER_CHANNEL_ID = "reminders";
 
 /** Push reminders are native-only; web is a no-op for registration flows. */
 export function isNativePushSupported(): boolean {
@@ -15,7 +27,7 @@ export function isNativePushSupported(): boolean {
 export function configureNotificationHandler(): void {
   if (!isNativePushSupported()) return;
 
-  Notifications.setNotificationHandler({
+  setNotificationHandler({
     handleNotification: async () => ({
       shouldPlaySound: true,
       shouldSetBadge: false,
@@ -25,13 +37,27 @@ export function configureNotificationHandler(): void {
   });
 }
 
+/** Android 8+ requires a channel before permission prompts / token fetch. */
+export async function ensureAndroidNotificationChannel(): Promise<void> {
+  if (Platform.OS !== "android") return;
+
+  await setNotificationChannelAsync(ANDROID_REMINDER_CHANNEL_ID, {
+    name: "Reminders",
+    importance: AndroidImportance.DEFAULT,
+    vibrationPattern: [0, 250, 250, 250],
+    lightColor: "#2563EB",
+  });
+}
+
 export async function requestNotificationPermissions(): Promise<boolean> {
   if (!isNativePushSupported()) return false;
 
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  await ensureAndroidNotificationChannel();
+
+  const { status: existingStatus } = await getPermissionsAsync();
   if (existingStatus === "granted") return true;
 
-  const { status } = await Notifications.requestPermissionsAsync();
+  const { status } = await requestPermissionsAsync();
   return status === "granted";
 }
 
@@ -40,7 +66,7 @@ export async function getNotificationPermissionStatus(): Promise<
 > {
   if (!isNativePushSupported()) return "undetermined";
 
-  const { status } = await Notifications.getPermissionsAsync();
+  const { status } = await getPermissionsAsync();
   if (status === "granted") return "granted";
   if (status === "denied") return "denied";
   return "undetermined";
@@ -69,8 +95,10 @@ export async function getExpoPushToken(): Promise<string> {
     throw new Error("Push notifications require a physical device, not a simulator.");
   }
 
+  await ensureAndroidNotificationChannel();
+
   const projectId = getEasProjectId();
-  const token = await Notifications.getExpoPushTokenAsync({ projectId });
+  const token = await getExpoPushTokenAsync({ projectId });
   return token.data;
 }
 
@@ -95,11 +123,11 @@ export async function registerPushToken(userId: string): Promise<void> {
 }
 
 export function addNotificationResponseListener(
-  callback: (response: Notifications.NotificationResponse) => void,
-): Notifications.EventSubscription {
+  callback: (response: NotificationResponse) => void,
+): EventSubscription {
   if (!isNativePushSupported()) {
     return { remove: () => {} };
   }
 
-  return Notifications.addNotificationResponseReceivedListener(callback);
+  return addNotificationResponseReceivedListener(callback);
 }

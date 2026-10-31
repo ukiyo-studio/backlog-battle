@@ -2,7 +2,7 @@ import { View } from "react-native";
 
 import { ITEM_STATUSES, type ItemStatus } from "@/types/backlog";
 
-import { Chip } from "./chip";
+import { Chip } from "@/components/ui";
 
 export function statusLabel(status: ItemStatus): string {
   return status.charAt(0).toUpperCase() + status.slice(1);

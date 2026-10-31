@@ -21,8 +21,14 @@ export default function HomeScreen() {
 
   const handleSignOut = async () => {
     setSigningOut(true);
-    await supabase.auth.signOut();
-    setSigningOut(false);
+    try {
+      const { error: signOutError } = await supabase.auth.signOut();
+      if (signOutError) {
+        console.warn("Sign out failed", signOutError.message);
+      }
+    } finally {
+      setSigningOut(false);
+    }
   };
 
   return (
@@ -40,7 +46,7 @@ export default function HomeScreen() {
         <LoadingState variant="inline" />
       ) : error ? (
         <ErrorState
-          description={`We couldn't load your categories. ${error.message}`}
+          description={`We couldn't load your categories. ${error}`}
           onRetry={() => void refetch()}
         />
       ) : categories && categories.length > 0 ? (

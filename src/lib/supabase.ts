@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient } from "@supabase/supabase-js";
-import { Platform } from "react-native";
+import { AppState, Platform } from "react-native";
 
 import type { Database } from "@/types/database";
 
@@ -24,3 +24,15 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: isWeb,
   },
 });
+
+// React Native: pause token refresh while backgrounded to avoid wake loops,
+// then resume when the app is active again (Supabase RN guidance).
+if (!isWeb) {
+  AppState.addEventListener("change", (state) => {
+    if (state === "active") {
+      void supabase.auth.startAutoRefresh();
+    } else {
+      void supabase.auth.stopAutoRefresh();
+    }
+  });
+}

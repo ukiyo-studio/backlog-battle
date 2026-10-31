@@ -73,7 +73,7 @@ export default function EditCategoryScreen() {
           title={error ? "Something went wrong" : "Category not found"}
           description={
             error
-              ? `We couldn't load this category. ${error.message}`
+              ? `We couldn't load this category. ${error}`
               : "This category may have been deleted."
           }
           onRetry={error ? () => void refetch() : undefined}

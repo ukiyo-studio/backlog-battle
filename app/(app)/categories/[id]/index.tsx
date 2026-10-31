@@ -19,7 +19,7 @@ import { useBacklogItems, useCategoryDetail } from "@/features/backlog-items/hoo
 import { startBattle } from "@/features/battles/api";
 import type { ItemStatus } from "@/types/backlog";
 
-import { useAuth } from "../../../_layout";
+import { useAuth } from "@/lib/auth";
 
 export default function CategoryDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();

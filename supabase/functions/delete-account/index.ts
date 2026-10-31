@@ -67,20 +67,16 @@ Deno.serve(async (req) => {
     .eq("user_id", userId);
 
   if (battlesError) {
-    return jsonResponse(
-      { error: `Failed to delete battles: ${battlesError.message}` },
-      500,
-    );
+    console.error("delete-account battles cleanup failed", battlesError.message);
+    return jsonResponse({ error: "Failed to delete account" }, 500);
   }
 
   // Remaining owner rows (profiles, categories, backlog_items, reminder_settings,
   // push_tokens) cascade from auth.users via ON DELETE CASCADE.
   const { error: deleteError } = await admin.auth.admin.deleteUser(userId);
   if (deleteError) {
-    return jsonResponse(
-      { error: `Failed to delete account: ${deleteError.message}` },
-      500,
-    );
+    console.error("delete-account auth delete failed", deleteError.message);
+    return jsonResponse({ error: "Failed to delete account" }, 500);
   }
 
   return jsonResponse({ deleted: true });
