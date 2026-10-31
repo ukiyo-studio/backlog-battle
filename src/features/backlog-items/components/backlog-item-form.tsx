@@ -1,11 +1,19 @@
 import * as React from "react";
 import { View } from "react-native";
 
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Text } from "@/components/ui";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Chip,
+  Input,
+  Text,
+} from "@/components/ui";
 import { backlogItemEditSchema, backlogItemFormSchema } from "@/schemas/backlog-item";
 import { ITEM_STATUSES, type ItemStatus } from "@/types/backlog";
 
-import { Chip } from "./chip";
 import { statusLabel } from "./status-filter";
 
 const QUICK_TYPES = ["Game", "Movie", "TV", "Book", "Anime", "Other"] as const;

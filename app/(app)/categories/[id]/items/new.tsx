@@ -8,7 +8,7 @@ import {
   type BacklogItemFormValues,
 } from "@/features/backlog-items/components";
 
-import { useAuth } from "../../../../_layout";
+import { useAuth } from "@/lib/auth";
 
 export default function NewBacklogItemScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();

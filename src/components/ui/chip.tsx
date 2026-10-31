@@ -1,6 +1,7 @@
 import { Pressable } from "react-native";
 
-import { cn, Text } from "@/components/ui";
+import { Text } from "./text";
+import { cn } from "./utils";
 
 export interface ChipProps {
   label: string;
@@ -13,7 +14,12 @@ export interface ChipProps {
  * Small selectable pill used for status filters/selectors and quick-pick
  * type suggestions. Selected chips fill with the secondary color.
  */
-export function Chip({ label, selected = false, disabled = false, onPress }: ChipProps) {
+export function Chip({
+  label,
+  selected = false,
+  disabled = false,
+  onPress,
+}: ChipProps) {
   return (
     <Pressable
       accessibilityRole="button"
@@ -28,7 +34,9 @@ export function Chip({ label, selected = false, disabled = false, onPress }: Chi
     >
       <Text
         variant="label"
-        className={selected ? "text-secondary-foreground" : "text-muted-foreground"}
+        className={
+          selected ? "text-secondary-foreground" : "text-muted-foreground"
+        }
       >
         {label}
       </Text>

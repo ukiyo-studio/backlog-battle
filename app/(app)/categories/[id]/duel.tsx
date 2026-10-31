@@ -2,17 +2,16 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { View } from "react-native";
 
-import { Button, Screen, Text } from "@/components/ui";
+import { Button, Chip, Screen, Text } from "@/components/ui";
 import {
   DUEL_CONTEXT_ENERGIES,
   DUEL_CONTEXT_TIMES,
   type DuelContextEnergy,
   type DuelContextTime,
 } from "@/domain";
-import { Chip } from "@/features/backlog-items/components/chip";
 import { startBattle } from "@/features/battles/api";
 
-import { useAuth } from "../../../_layout";
+import { useAuth } from "@/lib/auth";
 
 const TIME_LABELS: Record<DuelContextTime, string> = {
   tonight: "Tonight",
