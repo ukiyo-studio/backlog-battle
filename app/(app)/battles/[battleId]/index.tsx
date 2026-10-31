@@ -19,12 +19,13 @@ import type { BattleState, DomainMatchup } from "@/domain";
 import {
   abandonBattle,
   recordWinner,
-  type BattleBundle,
   type BattleItem,
+  type KnockoutBattleBundle,
 } from "@/features/battles/api";
 import {
   BattleProgressMeter,
   ChallengerCard,
+  StartDuelPlay,
   VsBadge,
 } from "@/features/battles/components";
 import { useBattleBundle } from "@/features/battles/hooks";
@@ -32,7 +33,7 @@ import { confirmDestructive } from "@/lib/confirm";
 
 interface LiveBattle {
   /** The bundle this continuation was derived from; a new fetch resets it. */
-  source: BattleBundle;
+  source: KnockoutBattleBundle;
   state: BattleState;
   matchups: DomainMatchup[];
 }
@@ -49,14 +50,6 @@ export default function BattlePlayScreen() {
   const [live, setLive] = useState<LiveBattle | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
-
-  if (bundle.data && live?.source !== bundle.data) {
-    setLive({
-      source: bundle.data,
-      state: bundle.data.state,
-      matchups: bundle.data.matchups,
-    });
-  }
 
   if (bundle.isLoading && !bundle.data) {
     return (
@@ -91,6 +84,24 @@ export default function BattlePlayScreen() {
   }
 
   const bundleData = bundle.data;
+
+  if (bundleData.algorithm === "start_duel") {
+    return (
+      <StartDuelPlay
+        bundle={bundleData}
+        onRefetch={() => void bundle.refetch()}
+      />
+    );
+  }
+
+  if (live?.source !== bundleData) {
+    setLive({
+      source: bundleData,
+      state: bundleData.state,
+      matchups: bundleData.matchups,
+    });
+  }
+
   const { battle, itemsById } = bundleData;
 
   if (battle.status === "completed") {

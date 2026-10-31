@@ -16,46 +16,21 @@ import {
   statusLabel,
 } from "@/features/backlog-items/components";
 import { useBacklogItems, useCategoryDetail } from "@/features/backlog-items/hooks";
-import { startBattle } from "@/features/battles/api";
 import type { ItemStatus } from "@/types/backlog";
-
-import { useAuth } from "../../../_layout";
 
 export default function CategoryDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const categoryId = id ?? "";
 
-  const { session } = useAuth();
   const category = useCategoryDetail(categoryId);
   const items = useBacklogItems(categoryId);
   const [statusFilter, setStatusFilter] = useState<ItemStatus>("active");
-  const [startingBattle, setStartingBattle] = useState(false);
-  const [battleError, setBattleError] = useState<string | null>(null);
 
   const activeItemCount = (items.data ?? []).filter(
     (item) => item.status === "active",
   ).length;
   const canBattle = activeItemCount >= 2;
-
-  const handleStartBattle = async () => {
-    if (!session) return;
-    setStartingBattle(true);
-    setBattleError(null);
-    try {
-      const battleId = await startBattle({
-        userId: session.user.id,
-        categoryId,
-      });
-      router.push(`/battles/${battleId}`);
-    } catch (cause) {
-      setBattleError(
-        cause instanceof Error ? cause.message : "Could not start the battle.",
-      );
-    } finally {
-      setStartingBattle(false);
-    }
-  };
 
   if (category.isLoading && !category.data) {
     return (
@@ -119,11 +94,10 @@ export default function CategoryDetailScreen() {
           <Button
             variant="secondary"
             className="flex-1"
-            onPress={() => void handleStartBattle()}
-            loading={startingBattle}
+            onPress={() => router.push(`/categories/${categoryId}/duel`)}
             disabled={!canBattle}
           >
-            Start battle
+            Start duel
           </Button>
           <Button
             variant="outline"
@@ -134,13 +108,8 @@ export default function CategoryDetailScreen() {
         </View>
         {!canBattle ? (
           <Text variant="caption">
-            You need at least 2 active items to start a battle
+            You need at least 2 active items to start a duel
             {activeItemCount === 1 ? " — one more to go!" : "."}
-          </Text>
-        ) : null}
-        {battleError ? (
-          <Text variant="caption" className="text-destructive">
-            {battleError}
           </Text>
         ) : null}
       </View>
@@ -163,7 +132,7 @@ export default function CategoryDetailScreen() {
       ) : allItems.length === 0 ? (
         <EmptyState
           title="No items yet"
-          description="Add your first item to start filling this backlog. You'll need at least 2 active items to run a battle."
+          description="Add your first item to start filling this backlog. You'll need at least 2 active items to run a duel."
         />
       ) : filteredItems.length === 0 ? (
         <EmptyState

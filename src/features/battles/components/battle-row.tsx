@@ -58,6 +58,12 @@ export function BattleRow({ battle, onPress }: BattleRowProps) {
               <Text variant="label" className="text-accent">
                 Continue
               </Text>
+            ) : status === "completed" &&
+              battle.algorithm === "start_duel" &&
+              battle.pickTitle ? (
+              <Text variant="caption" numberOfLines={1} className="max-w-[60%]">
+                Pick: {battle.pickTitle}
+              </Text>
             ) : status === "completed" && battle.championTitle ? (
               <Text variant="caption" numberOfLines={1} className="max-w-[60%]">
                 Champion: {battle.championTitle}

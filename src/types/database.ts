@@ -194,9 +194,14 @@ export type Database = {
           algorithm: string
           category_id: string
           completed_at: string | null
+          context_energy: string | null
+          context_time: string | null
           created_at: string
           id: string
           participant_item_ids: string[]
+          pick_item_id: string | null
+          pool_fallback: boolean
+          runner_up_item_id: string | null
           seed: number | null
           started_at: string
           status: string
@@ -207,9 +212,14 @@ export type Database = {
           algorithm?: string
           category_id: string
           completed_at?: string | null
+          context_energy?: string | null
+          context_time?: string | null
           created_at?: string
           id?: string
           participant_item_ids: string[]
+          pick_item_id?: string | null
+          pool_fallback?: boolean
+          runner_up_item_id?: string | null
           seed?: number | null
           started_at?: string
           status?: string
@@ -220,9 +230,14 @@ export type Database = {
           algorithm?: string
           category_id?: string
           completed_at?: string | null
+          context_energy?: string | null
+          context_time?: string | null
           created_at?: string
           id?: string
           participant_item_ids?: string[]
+          pick_item_id?: string | null
+          pool_fallback?: boolean
+          runner_up_item_id?: string | null
           seed?: number | null
           started_at?: string
           status?: string
@@ -235,6 +250,20 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "battles_pick_item_id_fkey"
+            columns: ["pick_item_id"]
+            isOneToOne: false
+            referencedRelation: "backlog_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "battles_runner_up_item_id_fkey"
+            columns: ["runner_up_item_id"]
+            isOneToOne: false
+            referencedRelation: "backlog_items"
             referencedColumns: ["id"]
           },
         ]
@@ -354,6 +383,79 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      start_checks: {
+        Row: {
+          battle_id: string
+          category_id: string
+          checked_at: string | null
+          context_energy: string
+          context_time: string
+          created_at: string
+          due_at: string
+          id: string
+          item_id: string
+          notified_at: string | null
+          outcome: string | null
+          runner_up_swapped: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          battle_id: string
+          category_id: string
+          checked_at?: string | null
+          context_energy: string
+          context_time: string
+          created_at?: string
+          due_at: string
+          id?: string
+          item_id: string
+          notified_at?: string | null
+          outcome?: string | null
+          runner_up_swapped?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          battle_id?: string
+          category_id?: string
+          checked_at?: string | null
+          context_energy?: string
+          context_time?: string
+          created_at?: string
+          due_at?: string
+          id?: string
+          item_id?: string
+          notified_at?: string | null
+          outcome?: string | null
+          runner_up_swapped?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "start_checks_battle_id_fkey"
+            columns: ["battle_id"]
+            isOneToOne: true
+            referencedRelation: "battles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "start_checks_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "start_checks_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "backlog_items"
             referencedColumns: ["id"]
           },
         ]

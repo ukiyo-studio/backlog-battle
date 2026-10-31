@@ -18,6 +18,10 @@ export default function BattleRankingScreen() {
   const bundle = useBattleBundle(battleId ?? "");
   const ranking = useBattleRanking(battleId ?? "");
 
+  if (bundle.data?.algorithm === "start_duel") {
+    return <Redirect href={`/battles/${bundle.data.battle.id}/start`} />;
+  }
+
   if (
     (bundle.isLoading && !bundle.data) ||
     (ranking.isLoading && !ranking.data)

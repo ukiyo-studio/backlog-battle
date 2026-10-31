@@ -6,3 +6,5 @@ export { ChallengerCard, VsBadge } from "./challenger-card";
 export type { ChallengerCardProps } from "./challenger-card";
 export { ChampionCard, RankRow } from "./ranking-rows";
 export type { RankRowProps } from "./ranking-rows";
+export { StartCheckPrompt } from "./start-check-prompt";
+export { StartDuelPlay } from "./start-duel-play";

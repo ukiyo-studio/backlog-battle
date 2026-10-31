@@ -2,12 +2,18 @@ import { View } from "react-native";
 
 import { Card, Text } from "@/components/ui";
 
-/** Gold hero card for the tournament winner. */
-export function ChampionCard({ title }: { title: string }) {
+/** Gold hero card for a finished pick or tournament winner. */
+export function ChampionCard({
+  title,
+  badge = "Champion",
+}: {
+  title: string;
+  badge?: string;
+}) {
   return (
     <Card className="items-center gap-3 bg-secondary p-6">
       <View className="rounded border-2 border-border bg-card px-3 py-1">
-        <Text variant="label">Champion</Text>
+        <Text variant="label">{badge}</Text>
       </View>
       <View className="h-20 w-20 items-center justify-center rounded border-3 border-border bg-card">
         <Text variant="title" className="text-4xl">
